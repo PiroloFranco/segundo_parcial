@@ -56,7 +56,18 @@ def elegir_palabra(lista_palabras):
 # ----------------- DIBUJAR ESTRUCTURA DEL AHORCADO -----------------
 def dibujar_estructura():
     # Dibuja la base, palo y cuerda del ahorcado (no cuenta como error)
-    pass
+    #BASE
+    BASE_COORDENADAS = pygame.draw.rect(VENTANA, NEGRO, (205, 600, 100, 4))
+    #PALO
+    PALO_COORDENADAS = pygame.draw.rect(VENTANA, NEGRO, (250, 350, 4, 250))
+    #DIAGONAL
+    DIAGONAL_COORDENADAS =pygame.draw.line(VENTANA, NEGRO, (251, 410),(320, 352), 4)    
+    #SOGA
+    SOGA_UNO_COORDENADAS = pygame.draw.rect(VENTANA, NEGRO, (250, 350, 100, 4))
+    SOGA_DOS_COORDENADAS = pygame.draw.rect(VENTANA, NEGRO, (350, 350, 4, 60))
+    
+    # AL IGUAL QUE EN EL PRIMER PARCIAL RETORNO TODAS LAS VARAIBLES CREADAS PARA MOSTRARLAS AL MOMENTO DE EJECUTAR LA FUNCION
+    return BASE_COORDENADAS, PALO_COORDENADAS, DIAGONAL_COORDENADAS,  SOGA_UNO_COORDENADAS, SOGA_DOS_COORDENADAS
 
 # ----------------- DIBUJAR PARTES DEL CUERPO -----------------
 def dibujar_cuerpo(errores):
@@ -93,7 +104,18 @@ def jugar():
     #     - Controlar FPS
 
     # Instrucción: este bloque debe ser completado por el estudiante según las consignas
-    pass
+
+     while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                quit()
+        VENTANA.fill(BLANCO)
+
+        dibujar_estructura()
+
+        pygame.display.update()
+        pygame.display.flip()
 
 # No ejecutar el juego automáticamente: solo se invoca desde consola o importación
 # Descomentar la línea siguiente para probar el juego terminado:
