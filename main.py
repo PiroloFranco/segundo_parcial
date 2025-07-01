@@ -16,8 +16,8 @@ import random
 pygame.init()
 
 # ----------------- CONFIGURACIÓN DE PANTALLA -----------------
-ANCHO = 800
-ALTO = 600
+ANCHO = 1000
+ALTO = 800
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
 #completar con nombre del equipo
 pygame.display.set_caption("Juego del Ahorcado")
@@ -56,24 +56,67 @@ def elegir_palabra(lista_palabras):
 # ----------------- DIBUJAR ESTRUCTURA DEL AHORCADO -----------------
 def dibujar_estructura():
     # Dibuja la base, palo y cuerda del ahorcado (no cuenta como error)
+    """
+        Esta función crea la estructura típica del juego del Ahorcado
+        No recibe ningún parametro y se dibujan en la pantalla las siguientes estructuras
+        "Base - Palo - Palo Diagonal - VIGA - SOGA"
+        Todas estas partes conforman la estructura y se dibujan una vez llamada la función 
+        No retorna nigun valor o variable
+    """
     #BASE
     BASE_COORDENADAS = pygame.draw.rect(VENTANA, NEGRO, (205, 600, 100, 4))
     #PALO
     PALO_COORDENADAS = pygame.draw.rect(VENTANA, NEGRO, (250, 350, 4, 250))
     #DIAGONAL
     DIAGONAL_COORDENADAS =pygame.draw.line(VENTANA, NEGRO, (251, 410),(320, 352), 4)    
+    #VIGA
+    VIGA = pygame.draw.rect(VENTANA, NEGRO, (250, 350, 100, 4))
     #SOGA
-    SOGA_UNO_COORDENADAS = pygame.draw.rect(VENTANA, NEGRO, (250, 350, 100, 4))
-    SOGA_DOS_COORDENADAS = pygame.draw.rect(VENTANA, NEGRO, (350, 350, 4, 60))
-    
-    # AL IGUAL QUE EN EL PRIMER PARCIAL RETORNO TODAS LAS VARAIBLES CREADAS PARA MOSTRARLAS AL MOMENTO DE EJECUTAR LA FUNCION
-    return BASE_COORDENADAS, PALO_COORDENADAS, DIAGONAL_COORDENADAS,  SOGA_UNO_COORDENADAS, SOGA_DOS_COORDENADAS
+    SOGA = pygame.draw.rect(VENTANA, NEGRO, (350, 350, 4, 60))
 
 # ----------------- DIBUJAR PARTES DEL CUERPO -----------------
 def dibujar_cuerpo(errores):
+    """
+        Esta función recibe un parametro "errores" del tipo "int"
+        Crea uno o más dibujos que se renderizara en base al número pasado por parametro
+        Cada dibujo corresponde a una parte del cuerpo y al número de errores que reciba, un máximo de 6:
+        1° Cabeza
+        2° Cuerpo
+        3° Pierna Izquierda
+        4° Pierna Derecha
+        5° Brazo Izquierdo
+        6° Brazo Derecho
+    """
     # Dibujar cabeza, tronco, brazos y piernas en base a la cantidad de errores
-    pass
-
+    match errores:
+        case 1:
+            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
+        case 2:
+            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
+            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
+        case 3:
+            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
+            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
+            PIERNA_IZQUIERDA = pygame.draw.line(VENTANA, NEGRO, (350, 500),(330, 540), 4)
+        case 4:
+            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
+            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
+            PIERNA_IZQUIERDA = pygame.draw.line(VENTANA, NEGRO, (350, 500),(330, 540), 4)
+            PIERNA_DERECHA = pygame.draw.line(VENTANA, NEGRO, (352, 500), (372, 540), 4)
+        case 5:
+            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
+            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
+            PIERNA_IZQUIERDA = pygame.draw.line(VENTANA, NEGRO, (350, 500),(330, 540), 4)
+            PIERNA_DERECHA = pygame.draw.line(VENTANA, NEGRO, (352, 500), (372, 540), 4)
+            BRAZO_IZQUIERDO = pygame.draw.line(VENTANA, NEGRO, (352, 460), (332, 470), 4)
+        case 6:
+            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
+            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
+            PIERNA_IZQUIERDA = pygame.draw.line(VENTANA, NEGRO, (350, 500),(330, 540), 4)
+            PIERNA_DERECHA = pygame.draw.line(VENTANA, NEGRO, (352, 500), (372, 540), 4)
+            BRAZO_IZQUIERDO = pygame.draw.line(VENTANA, NEGRO, (352, 460), (332, 470), 4)
+            BRAZO_DERECHO = pygame.draw.line(VENTANA, NEGRO, (352, 460), (372, 470), 4)
+        
 # ----------------- DIBUJAR JUEGO EN PANTALLA -----------------
 def dibujar_juego(palabra, letras_adivinadas, errores):
     # Llenar fondo, mostrar palabra oculta, letras ingresadas y dibujar estructura y cuerpo
@@ -86,8 +129,8 @@ def verificar_letra(letra, palabra, letras_adivinadas):
     pass
 
 # ----------------- SONIDO -----------------
-pygame.mixer.init()  # Inicializa el motor de sonido
-sonido_error = pygame.mixer.Sound("error.wav")  # Asegurate de tener este archivo
+# pygame.mixer.init()  # Inicializa el motor de sonido
+# sonido_error = pygame.mixer.Sound("error.wav")  # Asegurate de tener este archivo
 
 # ----------------- BUCLE PRINCIPAL -----------------
 def jugar():
@@ -104,8 +147,9 @@ def jugar():
     #     - Controlar FPS
 
     # Instrucción: este bloque debe ser completado por el estudiante según las consignas
+    errores = 0
 
-     while True:
+    while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -113,10 +157,11 @@ def jugar():
         VENTANA.fill(BLANCO)
 
         dibujar_estructura()
-
+        dibujar_cuerpo(3)
+        
         pygame.display.update()
         pygame.display.flip()
 
 # No ejecutar el juego automáticamente: solo se invoca desde consola o importación
 # Descomentar la línea siguiente para probar el juego terminado:
-# jugar()
+jugar()
