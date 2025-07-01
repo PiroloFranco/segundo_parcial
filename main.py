@@ -135,33 +135,57 @@ def verificar_letra(letra, palabra, letras_adivinadas):
 # ----------------- BUCLE PRINCIPAL -----------------
 def jugar():
     # 1. Cargar palabras desde archivo y elegir una al azar
+    palabra_elegida = elegir_palabra(cargar_palabras()) 
+
     # 2. Inicializar estructuras necesarias: letras_adivinadas, errores, reloj, banderas
-    # 3. Crear un bucle while que termine al cerrar el juego o al ganar/perder
-    # 4. Dentro del bucle:
-    #     - Capturar eventos (teclas)
-    #     - Verificar letras
-    #     - Incrementar errores si corresponde
-    #     - Dibujar estado del juego en pantalla
-    #     - Verificar condiciones de fin (victoria o derrota)
-    #     - Actualizar pantalla
-    #     - Controlar FPS
-
-    # Instrucción: este bloque debe ser completado por el estudiante según las consignas
+    letras_adivinadas = []
     errores = 0
+    max_errores = 6
+    bandera_juego = True 
+    reloj = pygame.time.Clock()
+    
+    # 3. Crear un bucle while que termine al cerrar el juego o al ganar/perder
+    while bandera_juego:
+        for evento in pygame.event.get():
+            if evento.type == pygame.QUIT:
+                bandera_juego = False
 
-    while True:
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                quit()
-        VENTANA.fill(BLANCO)
+    # 4. Dentro del bucle:
+    #   - Capturar eventos (teclas)
+            if evento.type == pygame.KEYDOWN:
+                letra = evento.unicode.upper()
 
-        dibujar_estructura()
-        dibujar_cuerpo(3)
-        
+    #   - Verificar letras
+        # try:
+        #     verificar_letra(letra,palabra_elegida,letras_adivinadas)  
+        # except as :
+
+    #   - Incrementar errores si corresponde
+            if not verificar_letra(letra,palabra_elegida,letras_adivinadas):
+                    errores += 1
+                    
+    #   - Dibujar estado del juego en pantalla
+            dibujar_estructura()
+            dibujar_cuerpo(errores)
+            dibujar_juego(palabra_elegida,letras_adivinadas,errores)
+
+    #   - Verificar condiciones de fin (victoria o derrota)
+            if len(letras_adivinadas) == len(palabra_elegida):
+                print("adjuntar sonido ganador")
+                break
+            
+            if max_errores == errores:
+                print("adjuntar sonido perdedor")
+                break
+    #   - Actualizar pantalla
         pygame.display.update()
-        pygame.display.flip()
 
+    #   - Controlar FPS
+        reloj.tick(30)
+
+    pygame.quit()
+
+# Instrucción: este bloque debe ser completado por el estudiante según las consignas
 # No ejecutar el juego automáticamente: solo se invoca desde consola o importación
 # Descomentar la línea siguiente para probar el juego terminado:
 jugar()
