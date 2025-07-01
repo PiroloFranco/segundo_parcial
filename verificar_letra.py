@@ -6,9 +6,9 @@ def verificar_letra(letra, palabra, letras_adivinadas):
     # Agregar la letra a letras_adivinadas si no estaba
     # Retornar True si la letra está en la palabra, False si no
 
-    #Paso las letras y las palabras a minuscula para evitar conflictos  
-    letra = letra.lower()
-    palabra = palabra.lower()
+    #Paso las letras y las palabras a mayuscula para evitar conflictos  
+    letra = letra.upper()
+    palabra = palabra.upper()
 
     #Realizo la verificacion de la letra y ademas valido que la letra sea un caracter valido y que no sea distinto de 1. si falla devuelve un mensaje de error
     if not (letra.isalpha() and len(letra) == 1):
