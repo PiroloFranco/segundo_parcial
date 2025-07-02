@@ -155,7 +155,9 @@ def jugar():
     letras_adivinadas = []
     errores = 0
     max_errores = 6
-    bandera_juego = True 
+    bandera_juego = True
+    bandera_victoria = False
+    bandera_derrota = False
     reloj = pygame.time.Clock()
     mensaje_adivino = None
     mensaje_error = None
@@ -174,7 +176,8 @@ def jugar():
     # 4. Dentro del bucle:
     #   - Capturar eventos (teclas)
             if evento.type == pygame.KEYDOWN:
-                if errores == max_errores or set(letras_adivinadas) == set(palabra_acortada) :
+                # Primero se evalua si alguna de las 2 banderas es true, de ser así, no permite el ingreso de otra tecla
+                if bandera_derrota or bandera_victoria :
                     break
                 else:
                     letra_presionada = evento.unicode.upper()
@@ -186,6 +189,9 @@ def jugar():
                     elif resultado == False:
                         sonido_error.play()
                         errores += 1
+                        # Evaluo si al sumar otro error ya se alcanzó el máximo de errores y cambio el estado de la bandera derrota para que no permita el ingreso de más letras
+                        if errores == max_errores:
+                            bandera_derrota = True
                         mensaje_error = FUENTE.render("Incorrecto, no has adivinado ninguna letra", True, ROJO)
                         mensaje_adivino = None
                     else:
@@ -242,6 +248,8 @@ def jugar():
         if set(letras_adivinadas) == set(palabra_acortada):
             mensaje_adivino = FUENTE.render("¡Has ganado, felicidades!", True, VERDE) 
             VENTANA.blit(mensaje_adivino, (200,200))
+            # En este lugar cambio el ingreso de la bandera de victoria a True, al evaluar si el jugador adivino todas las letras de la palabra elegida al azar
+            bandera_victoria = True
 
             #Agrego sonido de victoria
             if sonido_victoria and not sonido_victoria_reproducido: #Verifico que este cargado el sonido y que no se haya reproducido.
