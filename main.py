@@ -24,7 +24,7 @@ ANCHO = 1000
 ALTO = 800
 VENTANA = pygame.display.set_mode((ANCHO, ALTO))
 #completar con nombre del equipo
-pygame.display.set_caption("Juego del Ahorcado")
+pygame.display.set_caption("Juego del Ahorcado - Los desterrados")
 
 # ----------------- COLORES  se pueden modificar por los que elija el equipo-----------------
 BLANCO = (255, 255, 255)
@@ -177,6 +177,7 @@ def jugar():
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 bandera_juego = False
+                pygame.quit()
 
     # 4. Dentro del bucle:
     #   - Capturar eventos (teclas)
@@ -255,23 +256,24 @@ def jugar():
             acumulador_X_letras = acumulador_X + 7.5
         #   - Verificar condiciones de fin (victoria o derrota)
         if set(letras_adivinadas) == set(palabra_elegida):
-            mensaje_adivino = FUENTE.render("¡Has ganado, felicidades!", True, VERDE) 
-            VENTANA.blit(mensaje_adivino, (200,200))
-            # En este lugar cambio el ingreso de la bandera de victoria a True, al evaluar si el jugador adivino todas las letras de la palabra elegida al azar
-            bandera_victoria = True
-
             #Agrego sonido de victoria
             if sonido_victoria and not sonido_victoria_reproducido: #Verifico que este cargado el sonido y que no se haya reproducido.
                 sonido_victoria.play() # Reproduce el sonido
                 sonido_victoria_reproducido = True # Marca que ya sono y que no va a volver a reproducirse
-        if max_errores == errores and not sonido_muerte_reproducido:
-            mensaje_error = FUENTE.render("No has adivinado la palabra, suerte la próxima", True, ROJO) 
-            VENTANA.blit(mensaje_error, (200,200))
+            mensaje_adivino = FUENTE.render("¡Has ganado, felicidades!", True, VERDE) 
 
+            VENTANA.blit(mensaje_adivino, (200,200))
+            # En este lugar cambio el ingreso de la bandera de victoria a True, al evaluar si el jugador adivino todas las letras de la palabra elegida al azar
+            bandera_victoria = True            
+            
+        if max_errores == errores and not sonido_muerte_reproducido:
             #Agrego sonido de derrota(Grito)
             if sonido_grito and not sonido_muerte_reproducido:
                 sonido_grito.play()
                 sonido_muerte_reproducido = True
+
+            mensaje_error = FUENTE.render("No has adivinado la palabra, suerte la próxima", True, ROJO) 
+            VENTANA.blit(mensaje_error, (200,200))
 
         personaje.actualizar_pantalla(dict_personaje, VENTANA)
     #   - Actualizar pantalla
