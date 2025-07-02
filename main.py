@@ -104,24 +104,29 @@ def dibujar_juego(palabra, letras_adivinadas, errores):
     dibujar_estructura()
     # Se renderiza la palabra elegida
     acumulador_X = 500
+    acumulador_X_letras = 508
     contador_letras = 0
     # Recorro cada letra de la palabra elegida al azar
     for i in palabra:
         # Dibujo los guiones en base a la cantidad de letras que haya, utilizo un "acumulador" para ir dejando dibujando desde n posición x e ir aumentandola dejando un espacio en blanco, el 2 corresponde al width de los guiones
-        pygame.draw.line(VENTANA, NEGRO, (acumulador_X, 485), (acumulador_X + 20, 485), 2 )
+        pygame.draw.line(VENTANA, NEGRO, (acumulador_X, 485), (acumulador_X + 35, 485), 3 )
         # Evaluo si es la primer letra de la palabra con un contador o si es la última de la palabra para dibujarlas inicialmente
         if contador_letras == 0 or contador_letras == len(palabra):
             letra = FUENTE.render(i, True, NEGRO)
             # Reutilizo ese acumuador de X para dibujar por encima del guion la letra inicial y última
-            VENTANA.blit(letra, (acumulador_X,450))
+            VENTANA.blit(letra, (acumulador_X_letras,450))
             # Voy sumando el contador hasta llegar a el largo de la palabra elegida
             contador_letras += 1
         # Evaluo si la letra que estoy recorriendo se encuentra dentro de las letras adivinadas y la dibujo por encima del guion con el acumulador de X, 
         if i in letras_adivinadas:
             letra = FUENTE.render(i, True, NEGRO)
-            VENTANA.blit(letra, (acumulador_X,450))
+            if i.upper() == "I":
+                VENTANA.blit(letra, (acumulador_X_letras + 4.5,450))
+            else:
+                VENTANA.blit(letra, (acumulador_X_letras,450))
         # Como mencione anteriormente, voy sumando 20 que es el largo del guion + 5 que es la "separación entre cada guion dibujado
-        acumulador_X += 25
+        acumulador_X += 45
+        acumulador_X_letras = acumulador_X + 7.5
         contador_letras += 1
 
 
