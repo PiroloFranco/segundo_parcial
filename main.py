@@ -202,6 +202,7 @@ def jugar():
                 
         #Verifica si se mueve a la izquierda    
         if movimiento_usuario[pygame.K_LEFT]: 
+            mensaje_error = None #Para que no aparezca ningun mensaje de "Ingrese una letra valida" en caso de que se vaya a la derecha
             #Si se mueve a la izquierda tiene que moverse 10 pixeles hacia la izquierda
             pixeles_a_mover_X = -10
             #Actualizo el personaje llamando a la funcion
@@ -214,6 +215,7 @@ def jugar():
                 dict_personaje['mirando_derecha'] = False
 
         if movimiento_usuario[pygame.K_RIGHT]:
+            mensaje_error = None #Para que no aparezca ningun mensaje de "Ingrese una letra valida" en caso de que se vaya a la derecha
             pixeles_a_mover_X = +10
             personaje.actualizar_personaje(dict_personaje, pixeles_a_mover_X)
             if dict_personaje['mirando_derecha'] == False:
