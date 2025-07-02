@@ -12,6 +12,8 @@
 
 import pygame
 import random
+from verificar_cada_letra import verificar_cada_letra
+from crear_cuerpo import dibujar_cuerpo_por_parte
 
 pygame.init()
 
@@ -26,6 +28,7 @@ pygame.display.set_caption("Juego del Ahorcado")
 BLANCO = (255, 255, 255)
 NEGRO = (0, 0, 0)
 ROJO = (255, 0, 0)
+VERDE = (4, 255, 0)
 
 # ----------------- FUENTE -----------------
 FUENTE = pygame.font.SysFont(None, 48)
@@ -88,45 +91,46 @@ def dibujar_cuerpo(errores):
         6° Brazo Derecho
     """
     # Dibujar cabeza, tronco, brazos y piernas en base a la cantidad de errores
-    match errores:
-        case 1:
-            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
-        case 2:
-            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
-            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
-        case 3:
-            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
-            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
-            PIERNA_IZQUIERDA = pygame.draw.line(VENTANA, NEGRO, (350, 500),(330, 540), 4)
-        case 4:
-            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
-            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
-            PIERNA_IZQUIERDA = pygame.draw.line(VENTANA, NEGRO, (350, 500),(330, 540), 4)
-            PIERNA_DERECHA = pygame.draw.line(VENTANA, NEGRO, (352, 500), (372, 540), 4)
-        case 5:
-            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
-            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
-            PIERNA_IZQUIERDA = pygame.draw.line(VENTANA, NEGRO, (350, 500),(330, 540), 4)
-            PIERNA_DERECHA = pygame.draw.line(VENTANA, NEGRO, (352, 500), (372, 540), 4)
-            BRAZO_IZQUIERDO = pygame.draw.line(VENTANA, NEGRO, (352, 460), (332, 470), 4)
-        case 6:
-            CABEZA = pygame.draw.circle(VENTANA, NEGRO, (352, 430), 20, 4)
-            CUERPO = pygame.draw.rect(VENTANA, NEGRO, (350, 450, 4, 50))
-            PIERNA_IZQUIERDA = pygame.draw.line(VENTANA, NEGRO, (350, 500),(330, 540), 4)
-            PIERNA_DERECHA = pygame.draw.line(VENTANA, NEGRO, (352, 500), (372, 540), 4)
-            BRAZO_IZQUIERDO = pygame.draw.line(VENTANA, NEGRO, (352, 460), (332, 470), 4)
-            BRAZO_DERECHO = pygame.draw.line(VENTANA, NEGRO, (352, 460), (372, 470), 4)
+    dibujar_cuerpo_por_parte(errores)
         
 # ----------------- DIBUJAR JUEGO EN PANTALLA -----------------
 def dibujar_juego(palabra, letras_adivinadas, errores):
     # Llenar fondo, mostrar palabra oculta, letras ingresadas y dibujar estructura y cuerpo
-    pass
+    # Se renderiza el fondo
+    VENTANA.fill(BLANCO)
+    # Se dibuja la estructura del ahorcado
+    dibujar_estructura()
+    # Se renderiza la palabra elegida
+    acumulador_X = 500
+    contador_letras = 0
+    # Recorro cada letra de la palabra elegida al azar
+    for i in palabra:
+        # Dibujo los guiones en base a la cantidad de letras que haya, utilizo un "acumulador" para ir dejando dibujando desde n posición x e ir aumentandola dejando un espacio en blanco, el 2 corresponde al width de los guiones
+        pygame.draw.line(VENTANA, NEGRO, (acumulador_X, 485), (acumulador_X + 20, 485), 2 )
+        # Evaluo si es la primer letra de la palabra con un contador o si es la última de la palabra para dibujarlas inicialmente
+        if contador_letras == 0 or contador_letras == len(palabra):
+            letra = FUENTE.render(i, True, NEGRO)
+            # Reutilizo ese acumuador de X para dibujar por encima del guion la letra inicial y última
+            VENTANA.blit(letra, (acumulador_X,450))
+            # Voy sumando el contador hasta llegar a el largo de la palabra elegida
+            contador_letras += 1
+        # Evaluo si la letra que estoy recorriendo se encuentra dentro de las letras adivinadas y la dibujo por encima del guion con el acumulador de X, 
+        if i in letras_adivinadas:
+            letra = FUENTE.render(i, True, NEGRO)
+            VENTANA.blit(letra, (acumulador_X,450))
+        # Como mencione anteriormente, voy sumando 20 que es el largo del guion + 5 que es la "separación entre cada guion dibujado
+        acumulador_X += 25
+        contador_letras += 1
+
+
+    # Se dibujan las partes del cuerpo por n cantidad de errores
+    dibujar_cuerpo(errores)
 
 # ----------------- VERIFICAR LETRA -----------------
 def verificar_letra(letra, palabra, letras_adivinadas):
     # Agregar la letra a letras_adivinadas si no estaba
     # Retornar True si la letra está en la palabra, False si no
-    pass
+    verificar_cada_letra(letra, palabra, letras_adivinadas)
 
 # ----------------- SONIDO -----------------
 # pygame.mixer.init()  # Inicializa el motor de sonido
@@ -143,9 +147,12 @@ def jugar():
     max_errores = 6
     bandera_juego = True 
     reloj = pygame.time.Clock()
+    mensaje_adivino = None
+    mensaje_error = None
     
     # 3. Crear un bucle while que termine al cerrar el juego o al ganar/perder
     while bandera_juego:
+        letra_presionada = ""
         for evento in pygame.event.get():
             if evento.type == pygame.QUIT:
                 bandera_juego = False
@@ -153,30 +160,53 @@ def jugar():
     # 4. Dentro del bucle:
     #   - Capturar eventos (teclas)
             if evento.type == pygame.KEYDOWN:
-                letra = evento.unicode.upper()
-
-    #   - Verificar letras
-        # try:
-        #     verificar_letra(letra,palabra_elegida,letras_adivinadas)  
-        # except as :
-
-    #   - Incrementar errores si corresponde
-            if not verificar_letra(letra,palabra_elegida,letras_adivinadas):
-                    errores += 1
-                    
+                if errores == max_errores or set(letras_adivinadas) == set(palabra_acortada) :
+                    break
+                else:
+                    letra_presionada = evento.unicode.upper()
+                    resultado = verificar_cada_letra(letra_presionada, palabra_elegida, letras_adivinadas)
+                    # Se incrementan errores si corresponde
+                    if resultado == True:
+                        mensaje_adivino = FUENTE.render("¡Correcto!, adivinaste una letra", True, NEGRO)
+                        mensaje_error = None
+                    elif resultado == False:
+                        errores += 1
+                        mensaje_error = FUENTE.render("Incorrecto, no has adivinado ninguna letra", True, ROJO)
+                        mensaje_adivino = None
+                    else:
+                        mensaje_error = FUENTE.render(resultado, True, ROJO)
+                        mensaje_adivino = None
+                
     #   - Dibujar estado del juego en pantalla
-            dibujar_estructura()
-            dibujar_cuerpo(errores)
+        # Utilizo el condicional para que se muestre el cuerpo completo dibujado y no se reinicie
+        if errores < 6:
             dibujar_juego(palabra_elegida,letras_adivinadas,errores)
+        else:
+            dibujar_juego(palabra_elegida,letras_adivinadas,max_errores)
+
+        # Se actualizan los mensajes de letras adivinadas o errores que pueda tener al teclear el jugador
+        if mensaje_adivino:
+            VENTANA.blit(mensaje_adivino, (200,200))
+        elif mensaje_error:
+            VENTANA.blit(mensaje_error, (200,200))
 
     #   - Verificar condiciones de fin (victoria o derrota)
-            if len(letras_adivinadas) == len(palabra_elegida):
-                print("adjuntar sonido ganador")
-                break
-            
-            if max_errores == errores:
-                print("adjuntar sonido perdedor")
-                break
+        # Creo una lista de las letras de la palabra elgida
+        p_elegida = list(palabra_elegida)
+        # # Elimino la primer letra de la lista
+        p_elegida.pop(0)
+        # # Eliminio la ultima letra de la lista
+        p_elegida.pop(-1)
+        # Vuelvo a unir la palabra pero ahora sin esa primer y ultiima letra
+        palabra_acortada = "".join(p_elegida)
+        # Evaluo si no hay elementos duplicados y si son iguales, de ser así, el jugador adivinó todas las letras
+        if set(letras_adivinadas) == set(palabra_acortada):
+            mensaje_adivino = FUENTE.render("¡Has ganado, felicidades!", True, VERDE) 
+            VENTANA.blit(mensaje_adivino, (200,200))
+        if max_errores == errores:
+            mensaje_error = FUENTE.render("No has adivinado la palabra, suerte la próxima", True, ROJO) 
+            VENTANA.blit(mensaje_error, (200,200))
+
     #   - Actualizar pantalla
         pygame.display.update()
 
