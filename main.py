@@ -178,6 +178,7 @@ def jugar():
             if evento.type == pygame.QUIT:
                 bandera_juego = False
                 pygame.quit()
+                return
 
     # 4. Dentro del bucle:
     #   - Capturar eventos (teclas)
