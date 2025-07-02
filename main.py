@@ -161,9 +161,14 @@ def jugar():
     reloj = pygame.time.Clock()
     mensaje_adivino = None
     mensaje_error = None
+    letra_erronea = []
 
     sonido_muerte_reproducido = False
     sonido_victoria_reproducido = False
+
+    # Muestro la primera y ultinma letra de la palabra elegida para que no permita añadirlas como letras elegidas al momento de escuchar el evento
+    letras_adivinadas.append(palabra_elegida[0])
+    letras_adivinadas.append(palabra_elegida[-1])
     
     dict_personaje = personaje.crear_personaje(ANCHO/2,ALTO-200,200,200)
     # 3. Crear un bucle while que termine al cerrar el juego o al ganar/perder
@@ -193,6 +198,8 @@ def jugar():
                         if errores == max_errores:
                             bandera_derrota = True
                         mensaje_error = FUENTE.render("Incorrecto, no has adivinado ninguna letra", True, ROJO)
+                        # MOSTRAR EN LA PANTALLA LA LETRA QUE NO ADIVINO
+                        letra_erronea.append(FUENTE.render(letra_presionada, True, ROJO))
                         mensaje_adivino = None
                     else:
                         mensaje_error = FUENTE.render(resultado, True, ROJO)
@@ -238,16 +245,16 @@ def jugar():
             VENTANA.blit(mensaje_error, (200,200))
 
     #   - Verificar condiciones de fin (victoria o derrota)
-        # Creo una lista de las letras de la palabra elgida
-        p_elegida = list(palabra_elegida)
-        # # Elimino la primer letra de la lista
-        p_elegida.pop(0)
-        # # Eliminio la ultima letra de la lista
-        p_elegida.pop(-1)
-        # Vuelvo a unir la palabra pero ahora sin esa primer y ultiima letra
-        palabra_acortada = "".join(p_elegida)
-        # Evaluo si no hay elementos duplicados y si son iguales, de ser así, el jugador adivinó todas las letras
-        if set(letras_adivinadas) == set(palabra_acortada):
+        acumulador_X = 600
+        acumulador_X_letras = 608
+        letras_erradas = FUENTE.render("Letras que no adivinaste:", True, ROJO)
+        VENTANA.blit(letras_erradas, (200, 100))
+        for i in letra_erronea:
+            VENTANA.blit(i, (acumulador_X_letras + 4.5, 100))
+            acumulador_X += 45
+            acumulador_X_letras = acumulador_X + 7.5
+        #   - Verificar condiciones de fin (victoria o derrota)
+        if set(letras_adivinadas) == set(palabra_elegida):
             mensaje_adivino = FUENTE.render("¡Has ganado, felicidades!", True, VERDE) 
             VENTANA.blit(mensaje_adivino, (200,200))
             # En este lugar cambio el ingreso de la bandera de victoria a True, al evaluar si el jugador adivino todas las letras de la palabra elegida al azar
