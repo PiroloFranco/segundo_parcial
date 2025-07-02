@@ -11,7 +11,9 @@
 # - Solo las partes del cuerpo deben contar como errores, no el soporte del ahorcado.
 
 import pygame
+import pygame.mixer as mixer
 import random
+import personaje
 from verificar_cada_letra import verificar_cada_letra
 from crear_cuerpo import dibujar_cuerpo_por_parte
 
@@ -133,8 +135,11 @@ def verificar_letra(letra, palabra, letras_adivinadas):
     verificar_cada_letra(letra, palabra, letras_adivinadas)
 
 # ----------------- SONIDO -----------------
-# pygame.mixer.init()  # Inicializa el motor de sonido
-# sonido_error = pygame.mixer.Sound("error.wav")  # Asegurate de tener este archivo
+pygame.mixer.init()  # Inicializa el motor de sonido
+sonido_error = pygame.mixer.Sound("error.wav")  # Asegurate de tener este archivo
+sonido_grito = pygame.mixer.Sound("grito.wav")
+sonido_victoria = pygame.mixer.Sound("win.wav")
+mixer.music.set_volume(0.4)
 
 # ----------------- BUCLE PRINCIPAL -----------------
 def jugar():
@@ -149,7 +154,11 @@ def jugar():
     reloj = pygame.time.Clock()
     mensaje_adivino = None
     mensaje_error = None
+
+    sonido_muerte_reproducido = False
+    sonido_victoria_reproducido = False
     
+    dict_personaje = personaje.crear_personaje(ANCHO/2,ALTO-200,200,200)
     # 3. Crear un bucle while que termine al cerrar el juego o al ganar/perder
     while bandera_juego:
         letra_presionada = ""
@@ -166,16 +175,41 @@ def jugar():
                     letra_presionada = evento.unicode.upper()
                     resultado = verificar_cada_letra(letra_presionada, palabra_elegida, letras_adivinadas)
                     # Se incrementan errores si corresponde
-                    if resultado == True:
+                    if resultado == True:   
                         mensaje_adivino = FUENTE.render("¡Correcto!, adivinaste una letra", True, NEGRO)
                         mensaje_error = None
                     elif resultado == False:
+                        sonido_error.play()
                         errores += 1
                         mensaje_error = FUENTE.render("Incorrecto, no has adivinado ninguna letra", True, ROJO)
                         mensaje_adivino = None
                     else:
                         mensaje_error = FUENTE.render(resultado, True, ROJO)
                         mensaje_adivino = None
+
+        movimiento_usuario = pygame.key.get_pressed() #Variable que almacena las teclas que toca el usuario
+                
+        #Verifica si se mueve a la izquierda    
+        if movimiento_usuario[pygame.K_LEFT]: 
+            #Si se mueve a la izquierda tiene que moverse 10 pixeles hacia la izquierda
+            pixeles_a_mover_X = -10
+            #Actualizo el personaje llamando a la funcion
+            personaje.actualizar_personaje(dict_personaje, pixeles_a_mover_X)
+            #Verifica para donde esta mirando el personaje, para cambiar su orientacion
+            if dict_personaje['mirando_derecha'] == True:
+                #Si estaba mirando a la derecha entonces se da vuelta el personaje
+                dict_personaje['surface'] = pygame.transform.flip(dict_personaje['surface'], True, False)
+                #En caso de que mire a la izquierda se actualiza el esta parte del diccionario a False 
+                dict_personaje['mirando_derecha'] = False
+
+        if movimiento_usuario[pygame.K_RIGHT]:
+            pixeles_a_mover_X = +10
+            personaje.actualizar_personaje(dict_personaje, pixeles_a_mover_X)
+            if dict_personaje['mirando_derecha'] == False:
+                dict_personaje['surface'] = pygame.transform.flip(dict_personaje['surface'], True, False)
+                dict_personaje['mirando_derecha'] = True
+
+
                 
     #   - Dibujar estado del juego en pantalla
         # Utilizo el condicional para que se muestre el cuerpo completo dibujado y no se reinicie
@@ -203,10 +237,21 @@ def jugar():
         if set(letras_adivinadas) == set(palabra_acortada):
             mensaje_adivino = FUENTE.render("¡Has ganado, felicidades!", True, VERDE) 
             VENTANA.blit(mensaje_adivino, (200,200))
-        if max_errores == errores:
+
+            #Agrego sonido de victoria
+            if sonido_victoria and not sonido_victoria_reproducido: #Verifico que este cargado el sonido y que no se haya reproducido.
+                sonido_victoria.play() # Reproduce el sonido
+                sonido_victoria_reproducido = True # Marca que ya sono y que no va a volver a reproducirse
+        if max_errores == errores and not sonido_muerte_reproducido:
             mensaje_error = FUENTE.render("No has adivinado la palabra, suerte la próxima", True, ROJO) 
             VENTANA.blit(mensaje_error, (200,200))
 
+            #Agrego sonido de derrota(Grito)
+            if sonido_grito and not sonido_muerte_reproducido:
+                sonido_grito.play()
+                sonido_muerte_reproducido = True
+
+        personaje.actualizar_pantalla(dict_personaje, VENTANA)
     #   - Actualizar pantalla
         pygame.display.update()
 
